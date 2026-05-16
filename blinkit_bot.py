@@ -3,8 +3,6 @@ import requests
 BOT_TOKEN = "8944227127:AAFzNEzvnMUDWrr6jcSHLHBPys5_W85YbN8"
 CHAT_ID = "8966437145"
 
-SEARCH_WORD = "Hot Wheels"
-
 URL = "https://blinkit.com/s/?q=hot%20wheels"
 
 headers = {
@@ -15,23 +13,22 @@ def send_telegram(message):
 
     telegram_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
-    requests.post(telegram_url, data={
+    response = requests.post(telegram_url, data={
         "chat_id": CHAT_ID,
         "text": message
     })
 
+    print("Telegram response:")
+    print(response.text)
+
+print("Starting bot...")
+
 response = requests.get(URL, headers=headers)
 
-html = response.text
+print("Blinkit status code:")
+print(response.status_code)
 
-print("Checking Blinkit...")
+print("First 500 characters:")
+print(response.text[:500])
 
-if SEARCH_WORD.lower() in html.lower():
-
-    print("Found Hot Wheels!")
-
-    send_telegram("🔥 Hot Wheels detected on Blinkit!")
-
-else:
-
-    print("Not found")
+send_telegram("✅ GitHub bot is running successfully")
