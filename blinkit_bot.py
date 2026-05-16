@@ -3,7 +3,7 @@ import requests
 BOT_TOKEN = "8944227127:AAFzNEzvnMUDWrr6jcSHLHBPys5_W85YbN8"
 CHAT_ID = "8966437145"
 
-URL = "https://blinkit.com/s/?q=hot%20wheels"
+URL = "https://blinkit.com/v1/layout/search?q=hot%20wheels&search_type=type_to_search"
 
 headers = {
     "User-Agent": "Mozilla/5.0"
@@ -18,17 +18,42 @@ def send_telegram(message):
         "text": message
     })
 
-    print("Telegram response:")
     print(response.text)
 
-print("Starting bot...")
+print("Checking Blinkit API...")
 
 response = requests.get(URL, headers=headers)
 
-print("Blinkit status code:")
-print(response.status_code)
+print("Status code:", response.status_code)
 
-print("First 500 characters:")
-print(response.text[:500])
+data = response.json()
 
-send_telegram("✅ GitHub bot is running successfully")
+products_found = []
+
+response_text = str(data)
+
+keywords = [
+    "skyline",
+    "supra",
+    "gtr",
+    "nissan",
+    "hot wheels"
+]
+
+for keyword in keywords:
+
+    if keyword.lower() in response_text.lower():
+        products_found.append(keyword)
+
+if products_found:
+
+    message = "🔥 Hot Wheels Match Found:\n\n"
+
+    for item in products_found:
+        message += f"• {item}\n"
+
+    send_telegram(message)
+
+else:
+
+    print("No matching models found")
