@@ -6,19 +6,21 @@ CHAT_ID = "8966437145"
 URL = "https://blinkit.com/v1/layout/search?q=hot%20wheels&search_type=type_to_search"
 
 headers = {
-    "User-Agent": "Mozilla/5.0"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+    "Accept": "application/json",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Referer": "https://blinkit.com/",
+    "Origin": "https://blinkit.com"
 }
 
 def send_telegram(message):
 
     telegram_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
-    response = requests.post(telegram_url, data={
+    requests.post(telegram_url, data={
         "chat_id": CHAT_ID,
         "text": message
     })
-
-    print(response.text)
 
 print("Checking Blinkit API...")
 
@@ -26,9 +28,15 @@ response = requests.get(URL, headers=headers)
 
 print("Status code:", response.status_code)
 
-data = response.json()
+if response.status_code != 200:
 
-products_found = []
+    print("Blocked by Blinkit")
+
+    send_telegram(f"⚠️ Blinkit blocked request. Status: {response.status_code}")
+
+    exit()
+
+data = response.json()
 
 response_text = str(data)
 
@@ -39,6 +47,8 @@ keywords = [
     "nissan",
     "hot wheels"
 ]
+
+products_found = []
 
 for keyword in keywords:
 
@@ -56,4 +66,4 @@ if products_found:
 
 else:
 
-    print("No matching models found")
+    send_telegram("ℹ️ Bot ran successfully but no matches found")
